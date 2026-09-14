@@ -1,5 +1,6 @@
 #include <stdio.h>
-#include <stdlib.h> //For malloc and free
+#include <stdlib.h>
+#include <string.h>
 
 typedef struct _node
 {
@@ -60,10 +61,74 @@ void delete(Node **head, char *data)
 
 void order(Node *) {}
 
-int hasItem(Node *, char *) {}
+int hasItem(Node *head, char *data)
+{
+    Node *current = head;
+    while (current != NULL)
+    {
+        if (strcmp(current->data, data) == 0)
+        {
+            return 1; // Item was found
+        }
+        else
+        {
+            current = current->next_elem; // Move to the next node if the current node's data does not match the one we are looking for
+        }
+    }
+    return 0; // Item was not found
+}
 
 void findAndReplace(Node *, char *, char *) {}
 
-void print(Node *) {}
+void print(Node *head)
+{
+    while (head != NULL)
+    {
+        printf("%s \n", head->data);
+        head = head->next_elem;
+    }
+}
 
-int stop(Node **) {}
+int stop(Node **head) {}
+{
+}
+
+int main()
+{
+    Node *head = NULL;
+    char data[100];
+    char input[2];
+
+    while (1)
+    {
+        int result = scanf("%1s", input); // checking if the input is valid (should be 1 character)
+        if (result != 1)
+        {
+            fprintf(stderr, "No input has been given.\n");
+        }
+
+        if (input[0] == 'a')
+        {
+            scanf("%99s", data); // reading the string input up to 99 characters
+            add(&head, data);    // adding the string to the linked list using the add function
+        }
+        if (input[0] == 'd')
+        {
+            scanf("%99s", data);
+            delete(&head, data);
+        }
+        if (input[0] == 'p')
+        {
+            print(head);
+        }
+        if (input[0] == 's')
+        {
+            stop(&head);
+        }
+        if (input[0] == 'f')
+        {
+            scanf("%99s", data);
+            findAndReplace(head, data, data);
+        }
+    }
+}
