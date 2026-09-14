@@ -37,15 +37,33 @@ void delete(Node **head, char *data)
     {
         return; // If the list is empty, do nothing
     }
-    else if (strcmp((*head)->data, data) == 0)
+    if (strcmp((*head)->data, data) == 0)
     {
         Node *p = (*head)->next_elem; // Storing the next element of the head node in a temp variable
         free(*head);
         *head = p; // Upadting the variable in head to equal the next element of the deleted head node
     }
-    else
-    {
-        Node *p = *head;
-        Node *q = (*head)->next_elem;
+
+    Node *p = *head;
+    Node *q = (*head)->next_elem;
+    while (q != NULL && strcmp(q->data, data) != 0)
+    { // if the data in the current node is not equal to the desired data, move to the next node
+        p = q;
+        q = q->next_elem;
+    }
+    if (q != NULL)
+    { // Once the desired data is found, free the memory of the node and update the next element
+        p->next_elem = q->next_elem;
+        free(q);
     }
 }
+
+void order(Node *) {}
+
+int hasItem(Node *, char *) {}
+
+void findAndReplace(Node *, char *, char *) {}
+
+void print(Node *) {}
+
+int stop(Node **) {}
