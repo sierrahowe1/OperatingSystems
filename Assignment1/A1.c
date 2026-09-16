@@ -17,32 +17,54 @@ Node *create_node(char *data)
         exit(EXIT_FAILURE);
     }
 
-    new_node->data = data;      // Assign the data to the new node
-    new_node->next_elem = NULL; // Initialize the next_elem pointer to NULL
-    return new_node;            // Return the pointer to the new node so that it can be used in the calling function
+    new_node->data = malloc(strlen(data) + 1); // Assign the data to the new node
+    if (new_node->data == NULL)
+    {
+        fprintf(stderr, "Memory allocation failed for data!\n");
+        free(new_node); // Free the previously allocated node memory before exiting
+        exit(EXIT_FAILURE);
+    }
+    strcpy(new_node->data, data); // Copy the string data into the new node's data field
+    new_node->next_elem = NULL;   // Initialize the next_elem pointer to NULL
+    return new_node;              // Return the pointer to the new node so that it can be used in the calling function
 }
 
 void add(Node **head, char *data)
 {
     Node *new_node = create_node(data); // Create a new node with the given data
+    Node *current = *head;
     if (*head == NULL)
     {
         *head = new_node;           // If the list is empty, set the new node to be the head
         new_node->next_elem = NULL; // Make the new node point to NULL
     }
+    else if (current->next_elem == NULL)
+    {
+        current->next_elem = new_node;
+    }
+    else
+    {
+        while (current->next_elem != NULL)
+        {
+            current = current->next_elem;
+        }
+        current->next_elem = new_node;
+    }
 }
 
-void delete(Node **head, char *data)
+void delete(Node **head, char *data) // first instance
 {
     if (*head == NULL)
     {
-        return; // If the list is empty, do nothing
+        return;
     }
+
     if (strcmp((*head)->data, data) == 0)
     {
         Node *p = (*head)->next_elem; // Storing the next element of the head node in a temp variable
         free(*head);
-        *head = p; // Upadting the variable in head to equal the next element of the deleted head node
+        *head = p; // Updating the variable in head to equal the next element of the deleted head node
+        return;
     }
 
     Node *p = *head;
@@ -56,24 +78,27 @@ void delete(Node **head, char *data)
     { // Once the desired data is found, free the memory of the node and update the next element
         p->next_elem = q->next_elem;
         free(q);
+        return;
     }
 }
 
 void order(Node *head)
 {
-    while (head != NULL)
+    if (head == NULL || head->next_elem == NULL)
     {
-        Node *current = head;
-        while (current->next_elem != NULL)
+        return; // If the list is empty or only has one element, it is already ordered
+    }
+
+    Node *current = head;
+    while (current->next_elem != NULL)
+    {
+        if (strcmp(current->data, current->next_elem->data) > 0)
         {
-            if (strcmp(current->data, current->next_elem->data) > 0)
-            {
-                char *temp = current->data;
-                current->data = current->next_elem->data;
-                current->next_elem->data = temp;
-            }
-            current = current->next_elem;
+            char *temp = current->data;
+            current->data = current->next_elem->data;
+            current->next_elem->data = temp;
         }
+        current = current->next_elem;
     }
 }
 
@@ -96,22 +121,32 @@ int hasItem(Node *head, char *data)
 
 void findAndReplace(Node *head, char *old_data, char *new_data)
 {
-    while (head != NULL)
+    Node *current = head;
+    while (current != NULL)
     {
-        if (strcmp(head->data, old_data) == 0)
+        if (strcmp(current->data, old_data) == 0)
         {
-            head->data = new_data;
+            current->data = malloc(strlen(new_data) + 1);
+            if (current->data == NULL)
+            {
+                free(current->data);
+                fprintf(stderr, "Memory allocation failed for data!\n");
+                exit(EXIT_FAILURE);
+            }
+            strcpy(current->data, new_data);
+            break;
         }
-        head = head->next_elem;
+        current = current->next_elem;
     }
 }
 
 void print(Node *head)
 {
-    while (head != NULL)
+    Node *current = head;
+    while (current != NULL)
     {
-        printf("%s \n", head->data);
-        head = head->next_elem;
+        printf("%s \n", current->data);
+        current = current->next_elem;
     }
 }
 
@@ -139,6 +174,7 @@ int main()
     Node *head = NULL;
     char data[100];
     char input[2];
+    char new_data[100];
     int looping = 1;
 
     while (looping)
@@ -171,8 +207,8 @@ int main()
         if (input[0] == 'f')
         {
             scanf("%99s", data);
-            scanf("%99s", data);
-            findAndReplace(head, data, data);
+            scanf("%99s", new_data);
+            findAndReplace(head, data, new_data);
         }
         if (input[0] == 'o')
         {
