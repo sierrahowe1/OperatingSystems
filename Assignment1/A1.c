@@ -13,7 +13,7 @@ Node *create_node(char *data)
     Node *new_node = malloc(sizeof(Node)); // Allocate memory for a new node
     if (new_node == NULL)
     { // malloc returns NULL if memory allocation fails
-        fprintf(stderr, "Memmory allocation failed!\n");
+        fprintf(stderr, "Memory alloc ation failed!\n");
         exit(EXIT_FAILURE);
     }
 
@@ -59,7 +59,23 @@ void delete(Node **head, char *data)
     }
 }
 
-void order(Node *) {}
+void order(Node *head)
+{
+    while (head != NULL)
+    {
+        Node *current = head;
+        while (current->next_elem != NULL)
+        {
+            if (strcmp(current->data, current->next_elem->data) > 0)
+            {
+                char *temp = current->data;
+                current->data = current->next_elem->data;
+                current->next_elem->data = temp;
+            }
+            current = current->next_elem;
+        }
+    }
+}
 
 int hasItem(Node *head, char *data)
 {
@@ -78,7 +94,17 @@ int hasItem(Node *head, char *data)
     return 0; // Item was not found
 }
 
-void findAndReplace(Node *, char *, char *) {}
+void findAndReplace(Node *head, char *old_data, char *new_data)
+{
+    while (head != NULL)
+    {
+        if (strcmp(head->data, old_data) == 0)
+        {
+            head->data = new_data;
+        }
+        head = head->next_elem;
+    }
+}
 
 void print(Node *head)
 {
@@ -89,8 +115,23 @@ void print(Node *head)
     }
 }
 
-int stop(Node **head) {}
+int stop(Node **head)
 {
+    while (*head != NULL)
+    {
+        if ((*head)->next_elem == NULL)
+        { // If the head is the only node in the list we can just free it and set the head to NULL
+            free(*head);
+            *head = NULL;
+        }
+        else
+        {                               // Otherwise
+            Node *p = *head;            // we set a temporary variable to the head node
+            *head = (*head)->next_elem; // We update the head to point to the next node in the list
+            free(p);                    // And we free the memory of the node that stores the data of the previous head node
+        }
+    }
+    return 0;
 }
 
 int main()
@@ -98,13 +139,15 @@ int main()
     Node *head = NULL;
     char data[100];
     char input[2];
+    int looping = 1;
 
-    while (1)
+    while (looping)
     {
         int result = scanf("%1s", input); // checking if the input is valid (should be 1 character)
         if (result != 1)
         {
             fprintf(stderr, "No input has been given.\n");
+            break;
         }
 
         if (input[0] == 'a')
@@ -123,12 +166,17 @@ int main()
         }
         if (input[0] == 's')
         {
-            stop(&head);
+            looping = stop(&head);
         }
         if (input[0] == 'f')
         {
             scanf("%99s", data);
+            scanf("%99s", data);
             findAndReplace(head, data, data);
+        }
+        if (input[0] == 'o')
+        {
+            order(head);
         }
     }
 }
