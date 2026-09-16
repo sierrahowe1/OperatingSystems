@@ -62,6 +62,7 @@ void delete(Node **head, char *data) // first instance
     if (strcmp((*head)->data, data) == 0)
     {
         Node *p = (*head)->next_elem; // Storing the next element of the head node in a temp variable
+        free((*head)->data);
         free(*head);
         *head = p; // Updating the variable in head to equal the next element of the deleted head node
         return;
@@ -77,9 +78,22 @@ void delete(Node **head, char *data) // first instance
     if (q != NULL)
     { // Once the desired data is found, free the memory of the node and update the next element
         p->next_elem = q->next_elem;
+        free(q->data);
         free(q);
         return;
     }
+}
+
+int length(Node *head)
+{
+    int length = 0;
+    Node *current = head;
+    while (current != NULL)
+    {
+        length++;
+        current = current->next_elem;
+    }
+    return length;
 }
 
 void order(Node *head)
@@ -89,16 +103,20 @@ void order(Node *head)
         return; // If the list is empty or only has one element, it is already ordered
     }
 
-    Node *current = head;
-    while (current->next_elem != NULL)
+    for (int i = 0; i < length(head) - 1; ++i)
     {
-        if (strcmp(current->data, current->next_elem->data) > 0)
+        Node *current = head;
+        ; // Resetting current to the front of the list after each iteration so all element are compared
+        while (current != NULL && current->next_elem != NULL)
         {
-            char *temp = current->data;
-            current->data = current->next_elem->data;
-            current->next_elem->data = temp;
+            if (strcmp(current->data, current->next_elem->data) > 0)
+            {
+                char *temp = current->data;
+                current->data = current->next_elem->data;
+                current->next_elem->data = temp;
+            }
+            current = current->next_elem;
         }
-        current = current->next_elem;
     }
 }
 
@@ -126,14 +144,18 @@ void findAndReplace(Node *head, char *old_data, char *new_data)
     {
         if (strcmp(current->data, old_data) == 0)
         {
-            current->data = malloc(strlen(new_data) + 1);
-            if (current->data == NULL)
+            char *temp = current->data;
+            char *new_data_temp = malloc(strlen(new_data) + 1); // Allocate memory for the new data
+
+            if (new_data_temp == NULL)
             {
-                free(current->data);
+                free(temp);
                 fprintf(stderr, "Memory allocation failed for data!\n");
                 exit(EXIT_FAILURE);
             }
-            strcpy(current->data, new_data);
+            strcpy(new_data_temp, new_data);
+            free(temp);
+            current->data = new_data_temp;
             break;
         }
         current = current->next_elem;
@@ -156,6 +178,7 @@ int stop(Node **head)
     {
         if ((*head)->next_elem == NULL)
         { // If the head is the only node in the list we can just free it and set the head to NULL
+            free((*head)->data);
             free(*head);
             *head = NULL;
         }
@@ -163,7 +186,8 @@ int stop(Node **head)
         {                               // Otherwise
             Node *p = *head;            // we set a temporary variable to the head node
             *head = (*head)->next_elem; // We update the head to point to the next node in the list
-            free(p);                    // And we free the memory of the node that stores the data of the previous head node
+            free(p->data);
+            free(p); // And we free the memory of the node that stores the data of the previous head node
         }
     }
     return 0;
