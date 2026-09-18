@@ -234,6 +234,11 @@ int main()
             scanf("%99s", new_data);
             findAndReplace(head, data, new_data);
         }
+        if (input[0] == 'h')
+        {
+            scanf("%99s", data);
+            printf("%d\n", hasItem(head, data));
+        }
         if (input[0] == 'o')
         {
             order(head);
